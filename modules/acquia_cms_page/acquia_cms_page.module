@@ -1,0 +1,27 @@
+<?php
+
+/**
+ * @file
+ * Install, update and uninstall functions for the acquia_cms_page module.
+ */
+
+use Drupal\Core\Entity\Display\EntityFormDisplayInterface;
+
+/**
+ * Implements hook_entity_form_display_alter().
+ */
+function acquia_cms_page_entity_form_display_alter(EntityFormDisplayInterface &$form_display, array $context) {
+  if (isset($context['entity_type']) && isset($context['bundle'])) {
+    if ($context['entity_type'] == 'node' && $context['bundle'] == 'page') {
+      $id = $context['entity_type'] . "." . $context['bundle'] . ".site_studio";
+      $results = \Drupal::entityQuery('entity_form_display')
+        ->condition('id', $id)
+        ->condition('status', TRUE)
+        ->execute();
+      if ($results) {
+        $entity_display_repo = \Drupal::service('entity_display.repository');
+        $form_display = $entity_display_repo->getFormDisplay($context['entity_type'], $context['bundle'], 'site_studio');
+      }
+    }
+  }
+}
