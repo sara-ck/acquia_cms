@@ -1,3 +1,4 @@
+/.acquia export-ignore
 /acquia-pipelines.yml export-ignore
 /config/optional/views.view.acquia_search.yml export-ignore
 /.coveralls.yml export-ignore

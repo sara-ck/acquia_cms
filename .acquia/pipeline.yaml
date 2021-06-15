@@ -1,0 +1,143 @@
+type: default
+# The environment container image is used to prepare code versions
+# and tooling for tests during pre, post and build stages.
+environment_image:
+  file: "Dockerfile"
+  context: "."
+  args: ""
+  build_matrix:
+    base_images:
+      - python:3.9-alpine
+      - python:3.8-alpine
+  build_args:
+    - "REPO_LOCATION=jfrog.ais.acquia.io/devops-pipeline/"
+    - secrets:
+        - type: credential
+          key: service_token
+          value: hellomicro-token
+        - type: vault
+          key: test_key
+          value: API-KEY
+          path: secret/devops-hellomicro/test_key
+
+# Pre-build runs after building the environment image, and relies on it to
+# run its sub-stages' steps inside of the environment container.
+pre_build:
+  static_analysis_lint:
+    # Steps can be individual shell sessions, or grouped together to
+    # run in a single session, as shown below.
+    - steps:
+        - "echo static_analysis_lint isolated step"
+        - - "echo static_analysis_lint as part of a group"
+          - "echo static_analysis_lint also as part of a group"
+          - env
+  unit_tests:
+    - steps:
+        - echo unit_tests
+        - "[ $test_key = ThisIsaTestKey ]"
+      secrets:
+        - type: vault
+          key: test_key
+          value: API-KEY
+          path: secret/devops-hellomicro/test_key
+  code_analysis_coverage:
+    - steps:
+        - echo code_analysis_coverage
+        - |
+          if [ $BRANCH_NAME = 'main' ] || [ $BRANCH_NAME = 'master' ];
+          then
+            echo branch is $BRANCH_NAME;
+          else
+            echo branch is $GIT_BRANCH;
+          fi
+  security_composition_analysis:
+    required: true
+    directory: "."
+    language:
+      - python
+      - js
+    before:
+      - steps:
+          - "echo security_composition_analysis before step"
+
+# This stage builds the service image. If the service image file is the same
+# as the environment image file, this stage will just make a reassignment, and
+# will not build the same image again.
+build:
+  service_image:
+    file: "Dockerfile"
+    context: "."
+    args: ""
+    build_args:
+      - "REPO_LOCATION=jfrog.ais.acquia.io/devops-pipeline/"
+      - secrets:
+          - type: credential
+            key: service_token
+            value: hellomicro-token
+          - type: vault
+            key: test_key
+            value: API-KEY
+            path: secret/devops-hellomicro/test_key
+
+# This step performs container image security scan in Jfrog Xray via Artifactory
+# Build will fail whenever a vulnerability is found unless set to true.
+security_scan:
+  ignore_failures: true
+
+# Post-build has access to the service container deployed and already running,
+# so it is ideal for testing called from the pipeline into a cluster.
+post_build:
+  dev:
+    functional_tests:
+      - steps:
+          - echo functional_tests && set
+    integration_tests:
+      - steps:
+          - echo integration_tests && env
+          - "[ $test_key = ThisIsaTestKey ]"
+        secrets:
+          - type: vault
+            key: test_key
+            value: API-KEY
+            path: secret/devops-hellomicro/test_key
+  qa:
+    e2e_tests:
+      - steps:
+          - "echo end_to_end tests"
+    performance_tests:
+      - steps:
+          - "echo performance_tests"
+  staging:
+    acceptance_tests:
+      - steps:
+          - "echo acceptance_tests"
+
+# Test
+# boolean that
+cut_release_tag: true
+deploy:
+  - component: acd
+    require_production_approval: false
+  # Alternatively to deploy to Kaas using "acd" Teams can use their "custom" steps
+  #  - component: custom
+  #    steps:
+  #      - echo custom deployment steps
+  #    secrets:
+  #      - type: vault
+  #        key: test_key
+  #        value: API-KEY
+  #        path: secret/devops-hellomicro/test_key
+
+
+notify:
+  channel: test-jenkins-notifications
+  approvers:
+    - "andrew.wood@acquia.com"
+    - "mariano.asselborn@acquia.com"
+    - "navneet.verma@acquia.com"
+    - "nikhil.rompalli@acquia.com"
+    - "ricardo.amaro@acquia.com"
+    - "shane.vanhart@acquia.com"
+    - "shreyas.subhedar@acquia.com"
+    - "shubham.gundawar@acquia.com"
+    - "vishnu.chegondi@acquia.com"

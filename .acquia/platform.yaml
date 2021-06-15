@@ -1,0 +1,108 @@
+---
+apiVersion: v1
+# Use $SERVICE
+service: hellomicro
+project: hellomicro
+# Use $TEAM
+owner: devops
+
+base:
+  standard:
+    version: v0.2.4
+    values:
+      image:
+        # Use ${CONTAINER_REPO}.jfrog.us-east-1.ais.acquia.io/${SERVICE}
+        repository: jfrog.ais.acquia.io/devops-pipeline/hellomicro
+        # If non-prod don't supply a tag and the git commit hash is used by default to tag the container.
+        # tag: latest
+      replicaCount: 1
+      healthCheck:
+        path: /
+      service:
+        ports:
+          - port: 8080
+            targetPort: http
+            protocol: TCP
+            name: http
+      containerPorts:
+        - name: http
+          containerPort: 8080
+          protocol: TCP
+      ingress:
+        enabled: true
+        tlsEnabled: true
+        # Use ${TEAM}@acquia.com
+        letsEncryptEmail: devops@acquia.com
+        hostNameSuffix: .dev.cloudservices.acquia.io
+
+# Four standard variants
+# dev+qa   go to: csd-electro036 (dev kaas cluster)
+# staging* go to: csp-hermes2322
+# prod*    go to: csp-artemis2a7
+variants:
+  - name: dev
+    overrides:
+      standard:
+        values:
+          image:
+            repository: jfrog.ais.acquia.io/devops-pipeline-dev/hellomicro
+
+  - name: qa
+    overrides:
+      standard:
+        values:
+          image:
+            repository: jfrog.ais.acquia.io/devops-pipeline-qa/hellomicro
+
+  - name: staging
+    overrides:
+      standard:
+        values:
+          image:
+            repository: jfrog.ais.acquia.io/devops-pipeline-staging/hellomicro
+            tag: v2.0.3
+          ingress:
+            hostNameSuffix: .cloudservices.acquia.io
+
+  - name: prod
+    appNameOverride: hellomicro
+    overrides:
+      standard:
+        values:
+          image:
+            repository: jfrog.ais.acquia.io/devops-pipeline-prod/hellomicro
+            tag: v2.0.3
+          ingress:
+            hostNameSuffix: .cloudservices.acquia.io
+
+  # Examples of extra variants for deployment in qa,staging and prod
+  # Accepted characters for name:-'[a-z0-9]([-a-z0-9]*[a-z0-9])?(\\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*'
+  - name: qa-somebranch
+    appNameOverride: hellomicro-mainbranch
+    overrides:
+      standard:
+        values:
+          image:
+            repository: jfrog.ais.acquia.io/devops-pipeline-qa/hellomicro
+            tag: main
+
+  - name: staging-uat
+    overrides:
+      standard:
+        values:
+          image:
+            repository: jfrog.ais.acquia.io/devops-pipeline-staging/hellomicro
+            tag: v2.0.3
+          ingress:
+            hostNameSuffix: .cloudservices.acquia.io
+
+  - name: prod-eu
+    appNameOverride: hellomicro-eu
+    overrides:
+      standard:
+        values:
+          image:
+            repository: jfrog.ais.acquia.io/devops-pipeline-prod/hellomicro
+            tag: v2.0.3
+          ingress:
+            hostNameSuffix: .cloudservices.acquia.io
