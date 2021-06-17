@@ -15,6 +15,7 @@ use Drupal\Core\Ajax\CloseDialogCommand;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Installer\InstallerKernel;
 use Drupal\media_library\MediaLibraryState;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\HttpFoundation\Request;
 
 /**
@@ -33,6 +34,32 @@ function acquia_cms_install_tasks_alter(array &$tasks) {
   // Decorate the site configuration form to allow the user to configure their
   // Cohesion keys at install time.
   $tasks['install_configure_form']['function'] = SiteConfigureForm::class;
+  if (PHP_SAPI == 'cli') {
+    $first_key = key($tasks);
+    $tasks[$first_key]['function'] = 'acquia_cms_pre_start';
+  }
+}
+
+/**
+ * Print acquia cms icon on terminal and then start first active install task.
+ */
+function acquia_cms_pre_start($install_state) {
+  $function = $install_state['active_task'];
+  acquia_cms_print_icon();
+  return $function($install_state);
+}
+
+/**
+ * Prints the acquia cms icon on terminal.
+ */
+function acquia_cms_print_icon() {
+  $output = new ConsoleOutput();
+  $icon_path = DRUPAL_ROOT . '/' . drupal_get_path('profile', 'acquia_cms') . '/acquia_cms.icon.ascii';
+  // For local development, we've created symlink. So, get symlink file path.
+  $icon_path = !is_link($icon_path) ?: readlink($icon_path);
+  if (file_exists($icon_path)) {
+    $output->writeln('<info>' . file_get_contents($icon_path) . '</info>');
+  }
 }
 
 /**

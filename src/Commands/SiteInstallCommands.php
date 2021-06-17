@@ -22,6 +22,9 @@ class SiteInstallCommands extends DrushCommands {
       $this->say(dt('Rebuilding all entities.'));
       $result = \Drupal::service('acquia_cms_common.utility')->rebuildSiteStudio();
       $this->yell('Finished rebuilding.');
+      if (function_exists('acquia_cms_print_icon')) {
+        acquia_cms_print_icon();
+      }
       return is_array($result) && isset(array_shift($result)['error']) ? CommandResult::exitCode(self::EXIT_FAILURE) : CommandResult::exitCode(self::EXIT_SUCCESS);
     }
   }
