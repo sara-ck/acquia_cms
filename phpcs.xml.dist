@@ -26,7 +26,7 @@
 
   <rule ref="Drupal.InfoFiles.AutoAddedKeys.Version">
       <!-- Exclude .info.yml file from the auto add version key rule. -->
-      <exclude-pattern>acquia_cms\.info</exclude-pattern>
+      <exclude-pattern>acquia_cms\.info\.yml</exclude-pattern>
   </rule>
 
 </ruleset>
