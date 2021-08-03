@@ -17,4 +17,5 @@ dependencies:
   - drupal:smart_trim
   - drupal:focal_point
   - drupal:menu_ui
+  - drupal:search_api
   - drupal:scheduler_content_moderation_integration
