@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f4f09245272da7b90b5b5b22a96acb05",
+    "content-hash": "bd917627ee6bd50f87b8019129a62407",
     "packages": [
         {
             "name": "acquia/acsf-contenthub-console",
@@ -5538,68 +5538,6 @@
             "homepage": "https://www.drupal.org/project/moderation_sidebar",
             "support": {
                 "source": "https://git.drupalcode.org/project/moderation_sidebar"
-            }
-        },
-        {
-            "name": "drupal/mysql56",
-            "version": "1.2.0",
-            "source": {
-                "type": "git",
-                "url": "https://git.drupalcode.org/project/mysql56.git",
-                "reference": "8.x-1.2"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://ftp.drupal.org/files/projects/mysql56-8.x-1.2.zip",
-                "reference": "8.x-1.2",
-                "shasum": "a4c4f6a7846971f494ee7850132bfbe220ff8687"
-            },
-            "require": {
-                "drupal/core": "~9.0.0-beta3 || 9.1.* || 9.2.*"
-            },
-            "type": "library",
-            "extra": {
-                "drupal": {
-                    "version": "8.x-1.2",
-                    "datestamp": "1623858646",
-                    "security-coverage": {
-                        "status": "covered",
-                        "message": "Covered by Drupal's security advisory policy"
-                    }
-                },
-                "installer-name": "mysql"
-            },
-            "autoload": {
-                "psr-4": {
-                    "Drupal\\Driver\\Database\\mysql\\": ""
-                }
-            },
-            "notification-url": "https://packages.drupal.org/8/downloads",
-            "license": [
-                "GPL-2.0-or-later"
-            ],
-            "authors": [
-                {
-                    "name": "TravisCarden",
-                    "homepage": "https://www.drupal.org/user/236758"
-                },
-                {
-                    "name": "acquia",
-                    "homepage": "https://www.drupal.org/user/1231722"
-                },
-                {
-                    "name": "balsama",
-                    "homepage": "https://www.drupal.org/user/223087"
-                },
-                {
-                    "name": "effulgentsia",
-                    "homepage": "https://www.drupal.org/user/78040"
-                }
-            ],
-            "description": "MySQL 5.6 Driver for Drupal 9.",
-            "homepage": "https://www.drupal.org/project/mysql56",
-            "support": {
-                "source": "https://git.drupalcode.org/project/mysql56"
             }
         },
         {
