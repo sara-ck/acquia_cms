@@ -49,26 +49,29 @@ class HttpsRedirectSubscriber implements EventSubscriberInterface {
   public function onRequest(RequestEvent $event) {
     // Get the config value from cache if available.
     $https_status = $this->config->get('acquia_cms.settings')->get('acquia_cms_https');
-    if ($https_status) {
-      $request = $event->getRequest();
-      // Do not redirect from HTTPS requests.
-      if ($request->isSecure()) {
-        return;
+    $blackList = [
+      '127.0.0.1',
+      '::1',
+    ];
+    if (!in_array($_SERVER['REMOTE_ADDR'], $blackList)) {
+      if ($https_status) {
+        $request = $event->getRequest();
+        // Do not redirect from HTTPS requests.
+        if ($request->isSecure()) {
+          return;
+        }
+        $url = Url::fromUri("internal:{$request->getPathInfo()}");
+        $url->setOption('absolute', TRUE)
+          ->setOption('external', FALSE)
+          ->setOption('https', TRUE)
+          ->setOption('query', $request->query->all());
+
+        $status = $this->getRedirectStatus($event);
+        $url = $this->secureUrl($url->toString());
+        $response = new TrustedRedirectResponse($url, $status);
+        $event->setResponse($response);
       }
-
-      $url = Url::fromUri("internal:{$request->getPathInfo()}");
-      $url->setOption('absolute', TRUE)
-        ->setOption('external', FALSE)
-        ->setOption('https', TRUE)
-        ->setOption('query', $request->query->all());
-
-      $status = $this->getRedirectStatus($event);
-      $url = $this->secureUrl($url->toString());
-      $response = new TrustedRedirectResponse($url, $status);
-
-      $event->setResponse($response);
     }
-
   }
 
   /**
